@@ -3,7 +3,8 @@ const
   app = new Koa(),
   bodyParser = require('koa-bodyparser'),
   mongoose = require('mongoose'),
-  amqp = require('amqplib');
+  amqp = require('amqplib'),
+  queues = require('./queues');
 
 mongoose.Promise = Promise;
 
@@ -11,7 +12,7 @@ mongoose.Promise = Promise;
 const PORT = 3002;
 const DB = 'mongodb://localhost/foobot-messages';
 const AMQP_CONNECTION = 'amqp://localhost';
-const EXCHANGE_NAME = '';  // The name of the incoming messages exchange
+const EXCHANGE_NAME = 'messages';  // The name of the incoming messages exchange
 const AMQP_CONNECTION_RETRY_INTERVAL = 3000;
 const AMQP_CONNECTION_ATTEMPTS = 3;
 const DB_CONNECTION_ATTEMPTS = 10;
@@ -37,8 +38,9 @@ async function main() {
 
   const dbConnect = async () => {
     console.log('attempting db connection');
+    const connection = await mongoose.createConnection(DB, {useMongoClient: true});
     console.log('db connection successful');
-    return await mongoose.createConnection(DB, {useMongoClient: true});
+    return connection;
   };
 
   const amqpConnect = async () => {
@@ -55,9 +57,10 @@ async function main() {
   // const amqpConnection = await connect(amqpConnect, AMQP_CONNECTION_ATTEMPTS, AMQP_CONNECTION_RETRY_INTERVAL);
   
   app.listen(PORT);
-  console.log('messages service running')
+
+  // queues.consume();
+
+  console.log('messages service ready')
 }
-
-
 
 main();

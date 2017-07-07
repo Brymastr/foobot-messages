@@ -4,7 +4,7 @@ const router = new Router({
 });
 
 router.get('/', async ctx => {
-  ctx.body = 'get messages for user?'
+  ctx.body = 'get messages for user?';
 });
 
 router.post('/', async ctx => {
