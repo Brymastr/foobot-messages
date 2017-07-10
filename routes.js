@@ -1,14 +1,16 @@
 const Router = require('koa-router');
-const router = new Router({
-  prefix: '/messages'
-});
+const router = new Router();
 
 router.get('/', async ctx => {
-  ctx.body = 'get messages for user?';
+  ctx.body = 'get messages';
 });
 
-router.post('/', async ctx => {
-  ctx.body = `create a new message over http. Although I don't know why this would be done.`;
+router.get('/user/:id', async ctx => {
+  ctx.body = 'get messages for user';
+});
+
+router.get('/conversation/:id', async ctx => {
+  ctx.body = 'get messages for conversation';
 });
 
 module.exports = router.routes();

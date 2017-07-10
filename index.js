@@ -23,8 +23,11 @@ function connect(func, attempts, interval) {
     try {
       resolve(await func());
     } catch(err) {
-      if(attempts === 1)
+      console.error(err)
+      if(attempts === 1) {
         reject(new Error('Max connection attempts reached'));
+        return;
+      }
       setTimeout(async () => {
         resolve(await connect(func, --attempts, interval));
       }, interval);
@@ -47,20 +50,20 @@ async function main() {
     console.log('attempting amqp connection');    
     const connection = await amqp.connect(AMQP_CONNECTION);
     const channel = await connection.createChannel();
-    await channel.assertExchange(EXCHANGE_NAME, topic);
+    await channel.assertExchange(EXCHANGE_NAME, 'topic');
     channel.close();
-    console.log('db connection successful');
+    console.log('amqp connection successful');
     return connection;
   }
 
   const dbConnection = await connect(dbConnect, DB_CONNECTION_ATTEMPTS, DB_CONNECTION_RETRY_INTERVAL);
-  // const amqpConnection = await connect(amqpConnect, AMQP_CONNECTION_ATTEMPTS, AMQP_CONNECTION_RETRY_INTERVAL);
+  const amqpConnection = await connect(amqpConnect, AMQP_CONNECTION_ATTEMPTS, AMQP_CONNECTION_RETRY_INTERVAL);
   
+  queues.consume(amqpConnection);
   app.listen(PORT);
 
-  // queues.consume();
 
-  console.log('messages service ready')
+  console.log('messages service ready');
 }
 
 main();

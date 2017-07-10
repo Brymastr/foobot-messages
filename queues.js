@@ -18,16 +18,17 @@ exports.consume = async function(connection) {
 
     try {
       await saveMessage(m);
+
+      // TODO: Remove. This is to simulate some work being done
+      setTimeout(() => {
+        console.log('ack');
+      }, 2000);
+
+      message.ack();
+
     } catch(err) {
       message.nack();
     }
-
-    // TODO: Remove. This is to simulate some work being done
-    setTimeout(() => {
-      console.log('ack');
-    }, 2000);
-
-    message.ack();
 
   });
 }
