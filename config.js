@@ -1,7 +1,7 @@
 module.exports = () => {
   const env = process.env;
   return config = {
-    PORT: 3002,
+    PORT: env.PORT || 3002,
     DB: env.DB || 'mongodb://localhost/foobot-messages',
     
     DB_CONNECTION_ATTEMPTS: 10,

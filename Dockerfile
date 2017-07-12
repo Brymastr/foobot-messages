@@ -7,5 +7,4 @@ RUN npm i --only=production
 
 COPY . /src
 
-
 CMD ["npm", "start"]
