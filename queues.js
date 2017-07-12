@@ -1,48 +1,41 @@
-const amqp = require('amqplib');
+const
+  amqp = require('amqplib');
 
-const INCOMING_QUEUE_NAME = 'incoming_messages';
-const EXCHANGE_NAME = 'messages';
-const ROUTE_KEY = 'message.*.incoming';
+let connection;
 
-exports.consume = async function(connection) {
+exports.setup = async function() {
+  console.log('attempting amqp connection');
+
+  // Connect
+  connection = await amqp.connect(config.AMQP_CONNECTION);
   const channel = await connection.createChannel();
-  const queue = await channel.assertQueue(INCOMING_QUEUE_NAME);
-  channel.bindQueue(INCOMING_QUEUE_NAME, EXCHANGE_NAME, ROUTE_KEY);
 
+  // Assert exchange
+  await channel.assertExchange(config.MESSAGES_EXCHANGE_NAME, 'topic');
 
-  channel.consume(INCOMING_QUEUE_NAME, async message => {
+  // Assert incoming queue
+  await channel.assertQueue(config.INCOMING_QUEUE_NAME);
+  channel.bindQueue(config.INCOMING_QUEUE_NAME, config.MESSAGES_EXCHANGE_NAME, config.INCOMING_ROUTE_KEY);
+
+  // Close channel and return
+  // channel.close();
+  console.log('amqp connection successful');
+  return connection;
+}
+
+exports.consume = async function(queueName, exchangeName, routeKey, func) {
+  const channel = await connection.createChannel();
+
+  channel.consume(queueName, async message => {
     const m = JSON.parse(message.content.toString());
-    console.log(`read: ${m}`);
-
-    const user = await getUser(m);
 
     try {
-      await saveMessage(m);
-
-      // TODO: Remove. This is to simulate some work being done
-      setTimeout(() => {
-        console.log('ack');
-      }, 2000);
-
-      message.ack();
-
+      await func(m);
+      channel.ack(message);
     } catch(err) {
-      message.nack();
+      console.log(err)
+      channel.nack(message);
     }
 
   });
-}
-
-async function saveMessage(message) {
-  try {
-    await Message.create(message);
-  } catch(err) {
-    console.error('Error saving message');
-  }
-}
-
-async function getUser(message) {
-  // TODO: Get a user from the user service based on the user_id and platform fields of the message.
-  // If there exists a foobot user for this platform/id, return the foobot user id
-  return message.user_id;
 }
