@@ -3,7 +3,6 @@ const
   app = new Koa(),
   bodyParser = require('koa-bodyparser'),
   mongoose = require('mongoose'),
-  amqp = require('amqplib'),
   queues = require('./queues'),
   config = require('./config')(),
   actions = require('./actions');

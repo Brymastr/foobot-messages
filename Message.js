@@ -8,6 +8,7 @@ const
  * NORMALIZED INCOMING message
  */
 module.exports = mongoose.model('Message', Schema({
+  message_id: String,   // id of the message in the platform. This is needed for updating and referencing existing messages
   text: String,         // content of the message
   date: Date,           // date the message was received (platform time)
   platform: String,     // platform that the message came from

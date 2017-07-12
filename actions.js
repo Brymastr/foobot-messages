@@ -17,6 +17,6 @@ async function saveMessage(message) {
     await Message.create(message);
     console.log(`message saved: ${message.text}`);
   } catch(err) {
-    console.error('Error saving message');
+    console.error(`Error saving message: ${err}`);
   }
 }
