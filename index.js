@@ -34,7 +34,7 @@ async function main() {
 
 function dbConnect() {
   console.log('attempting db connection');
-  mongoose.connect(config.DB);
+  mongoose.connect(config.DB, {useMongoClient: true});
   console.log('db connection successful');
 }
 
@@ -43,7 +43,7 @@ function connect(func, attempts, interval) {
     try {
       resolve(await func());
     } catch(err) {
-      console.error(err)
+      // console.error(err)
       if(attempts === 1) {
         reject(new Error('Max connection attempts reached'));
         return;
