@@ -21,7 +21,7 @@ exports.setup = async function() {
   // channel.close();
   console.log('amqp connection successful');
   return connection;
-}
+};
 
 exports.consume = async function(queueName, exchangeName, routeKey, func) {
   const channel = await connection.createChannel();
@@ -38,4 +38,10 @@ exports.consume = async function(queueName, exchangeName, routeKey, func) {
     }
 
   });
-}
+};
+
+exports.publish = async function(message, routeKey, exchangeName) {
+  const channel = await connection.createChannel();
+  channel.publish(exchangeName, routeKey, new Buffer(JSON.stringify(message)));
+  channel.close();  
+};

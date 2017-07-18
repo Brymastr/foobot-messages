@@ -1,14 +1,12 @@
 const
   users = require('./users'),
-  Message = require('./Message');
+  Message = require('./Message'),
+  queues = require('./queues');
 
 exports.process = async function(message) {
-  // message.user_id is the id from the platform
-  const user_id = await users.getUserByPlatformId(message.user_id);
-  message.user_id = user_id;
-  return await saveMessage(message);
+  await saveMessage(message);
 
-  // TODO: Send message to the next step
+  queues.publish(message, config.PROCESSING_PUBLISH_KEY, config.MESSAGES_EXCHANGE_NAME);
 };
 
 async function saveMessage(message) {
