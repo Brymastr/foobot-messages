@@ -12,7 +12,7 @@ module.exports = mongoose.model('Message', Schema({
   text: String,         // content of the message
   date: Date,           // date the message was received (platform time)
   platform: String,     // platform that the message came from
-  user_id: String,      // foobot id for a user. This comes from the telegram service as telegram user ID and is converted in this service to a foobot user id before saving
+  user_id: String,      // platform id for a user (telegram chat_id)
   group_id: String,     // id of the conversation that this message was a part of
   is_group: {type: Boolean, default: false}  // is this message a part of a group chat?
 }));
